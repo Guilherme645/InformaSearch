@@ -16,16 +16,16 @@ import java.util.List;
 @Service
 public class NoticiaService {
 
-    private static final String RSS_FEED_URL = "https://rss.uol.com.br/feed/tecnologia.xml";
+    private static final String RSS_FEED_URL = "https://portalnoticiasr7.webnode.page/rss/noticias.xml";
 
     // Método para obter notícias do dia do feed RSS
     public List<Noticia> obterNoticiasDoDia() {
         List<Noticia> noticias = new ArrayList<>();
         try {
             // Configurando a conexão HTTP com o User-Agent e a codificação UTF-8
-            URL url = new URL("https://rss.uol.com.br/feed/tecnologia.xml");
+            URL url = new URL(RSS_FEED_URL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36");
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
             connection.setRequestProperty("Accept-Charset", "UTF-8");
 
             InputStream inputStream = connection.getInputStream();
@@ -39,18 +39,12 @@ public class NoticiaService {
             NodeList items = doc.getElementsByTagName("item");
             for (int i = 0; i < items.getLength(); i++) {
                 Element item = (Element) items.item(i);
-
                 String titulo = item.getElementsByTagName("title").item(0).getTextContent();
                 String link = item.getElementsByTagName("link").item(0).getTextContent();
-
-                // Processa a descrição para remover tags HTML e caracteres especiais
                 String descricao = item.getElementsByTagName("description").item(0).getTextContent();
                 descricao = descricao.replaceAll("<[^>]*>", ""); // Remove tags HTML
-                descricao = descricao.replace("\\u003C", "<").replace("\\u003E", ">"); // Decodifica < e >
 
-                String pubDate = item.getElementsByTagName("pubDate").item(0).getTextContent();
-
-                // Adiciona a notícia à lista
+                // Cria uma instância de Noticia e adiciona à lista
                 Noticia noticia = new Noticia(titulo, link, descricao, LocalDate.now());
                 noticias.add(noticia);
             }
