@@ -2,25 +2,41 @@ package com.informasearch.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
+
 import java.time.LocalDate;
 
-@Document(indexName = "noticias")  // Define o índice do Elasticsearch
+@Document(indexName = "noticias")
 public class Noticia {
 
     @Id
-    private String id;  // Campo de identificação
+    private String id;  // Propriedade de identificação
 
     private String titulo;
     private String link;
     private String descricao;
     private LocalDate dataPublicacao;
+    private String faviconUrl;
+    private String sourceUrl;
 
-    // Construtor com todos os parâmetros, exceto o id
-    public Noticia(String titulo, String link, String descricao, LocalDate dataPublicacao) {
+    // Construtor que inclui o campo 'id'
+    public Noticia(String id, String titulo, String link, String descricao, LocalDate dataPublicacao, String faviconUrl, String sourceUrl) {
+        this.id = id;
         this.titulo = titulo;
         this.link = link;
         this.descricao = descricao;
         this.dataPublicacao = dataPublicacao;
+        this.faviconUrl = faviconUrl;
+        this.sourceUrl = sourceUrl;
+    }
+
+    // Construtor sem o campo 'id', caso 'id' seja gerado automaticamente
+    public Noticia(String titulo, String link, String descricao, LocalDate dataPublicacao, String faviconUrl, String sourceUrl) {
+        this.titulo = titulo;
+        this.link = link;
+        this.descricao = descricao;
+        this.dataPublicacao = dataPublicacao;
+        this.faviconUrl = faviconUrl;
+        this.sourceUrl = sourceUrl;
     }
 
     // Getters e setters
@@ -62,5 +78,21 @@ public class Noticia {
 
     public void setDataPublicacao(LocalDate dataPublicacao) {
         this.dataPublicacao = dataPublicacao;
+    }
+
+    public String getFaviconUrl() {
+        return faviconUrl;
+    }
+
+    public void setFaviconUrl(String faviconUrl) {
+        this.faviconUrl = faviconUrl;
+    }
+
+    public String getSourceUrl() {
+        return sourceUrl;
+    }
+
+    public void setSourceUrl(String sourceUrl) {
+        this.sourceUrl = sourceUrl;
     }
 }

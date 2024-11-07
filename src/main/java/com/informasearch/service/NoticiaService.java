@@ -12,30 +12,30 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Map;
+import java.util.HashMap;
 @Service
 public class NoticiaService {
 
     // Lista de URLs de feeds RSS para obter notícias de múltiplas fontes
-    private static final List<String> RSS_FEED_URLS = List.of(
-            "https://portalnoticiasr7.webnode.page/rss/noticias.xml",
-            "https://www.uol.com.br/rss.xml",
-            "https://g1.globo.com/rss/g1/",
-            "https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml"  // Exemplo de novo RSS
-            // Adicione outras URLs de RSS aqui
-    );
+    private static final Map<String, String> RSS_FEEDS = new HashMap<>() {{
+        put("https://portalnoticiasr7.webnode.page/rss/noticias.xml", "https://portalnoticiasr7.webnode.page");
+        put("https://www.uol.com.br/rss.xml", "https://www.uol.com.br");
+        put("https://g1.globo.com/rss/g1/", "https://g1.globo.com");
+        put("https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml", "https://www.nytimes.com");
+    }};
 
     // Método para obter notícias do dia de todos os feeds RSS
     public List<Noticia> obterNoticiasDoDia() {
         List<Noticia> todasNoticias = new ArrayList<>();
-        for (String rssUrl : RSS_FEED_URLS) {
-            todasNoticias.addAll(obterNoticiasDeRSS(rssUrl));
+
+        for (Map.Entry<String, String> feed : RSS_FEEDS.entrySet()) {
+            todasNoticias.addAll(obterNoticiasDeRSS(feed.getKey(), feed.getValue()));
         }
         return todasNoticias;
     }
 
-    // Método auxiliar para obter notícias de um feed RSS específico
-    private List<Noticia> obterNoticiasDeRSS(String rssUrl) {
+    private List<Noticia> obterNoticiasDeRSS(String rssUrl, String siteUrl) {
         List<Noticia> noticias = new ArrayList<>();
         try {
             URL url = new URL(rssUrl);
@@ -57,7 +57,10 @@ public class NoticiaService {
                 String descricao = item.getElementsByTagName("description").item(0).getTextContent();
                 descricao = descricao.replaceAll("<[^>]*>", ""); // Remove tags HTML
 
-                Noticia noticia = new Noticia(titulo, link, descricao, LocalDate.now());
+                // Define o favicon e o siteUrl para cada notícia com base no feed
+                String faviconUrl = siteUrl + "/favicon.ico";
+
+                Noticia noticia = new Noticia(titulo, link, descricao, LocalDate.now(), faviconUrl, siteUrl);
                 noticias.add(noticia);
             }
         } catch (Exception e) {
@@ -65,6 +68,7 @@ public class NoticiaService {
         }
         return noticias;
     }
+
 
     // Método para buscar e paginar notícias filtradas por termo
     public List<Noticia> buscarNoticiasPorTermo(String termo, int page, int pageSize) {
