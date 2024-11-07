@@ -47,13 +47,19 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>co.elastic.clients</groupId>
+			<artifactId>elasticsearch-java</artifactId>
+			<version>8.10.2</version> <!-- Certifique-se de ajustar para a versão do seu Elasticsearch -->
+		</dependency>
 		<!-- Rome for RSS Handling -->
 		<dependency>
 			<groupId>com.rometools</groupId>
 			<artifactId>rome</artifactId>
 			<version>1.18.0</version>
 		</dependency>
+
+
 
 		<!-- Apache HttpClient for HTTP Requests -->
 		<dependency>

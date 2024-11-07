@@ -16,26 +16,39 @@ import java.util.List;
 @Service
 public class NoticiaService {
 
-    private static final String RSS_FEED_URL = "https://portalnoticiasr7.webnode.page/rss/noticias.xml";
+    // Lista de URLs de feeds RSS para obter notícias de múltiplas fontes
+    private static final List<String> RSS_FEED_URLS = List.of(
+            "https://portalnoticiasr7.webnode.page/rss/noticias.xml",
+            "https://www.uol.com.br/rss.xml",
+            "https://g1.globo.com/rss/g1/",
+            "https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml"  // Exemplo de novo RSS
+            // Adicione outras URLs de RSS aqui
+    );
 
-    // Método para obter notícias do dia do feed RSS
+    // Método para obter notícias do dia de todos os feeds RSS
     public List<Noticia> obterNoticiasDoDia() {
+        List<Noticia> todasNoticias = new ArrayList<>();
+        for (String rssUrl : RSS_FEED_URLS) {
+            todasNoticias.addAll(obterNoticiasDeRSS(rssUrl));
+        }
+        return todasNoticias;
+    }
+
+    // Método auxiliar para obter notícias de um feed RSS específico
+    private List<Noticia> obterNoticiasDeRSS(String rssUrl) {
         List<Noticia> noticias = new ArrayList<>();
         try {
-            // Configurando a conexão HTTP com o User-Agent e a codificação UTF-8
-            URL url = new URL(RSS_FEED_URL);
+            URL url = new URL(rssUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0");
             connection.setRequestProperty("Accept-Charset", "UTF-8");
 
             InputStream inputStream = connection.getInputStream();
             InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
 
-            // Converte o XML em um objeto Document
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             Document doc = factory.newDocumentBuilder().parse(new org.xml.sax.InputSource(reader));
 
-            // Extrai cada item (notícia) do XML
             NodeList items = doc.getElementsByTagName("item");
             for (int i = 0; i < items.getLength(); i++) {
                 Element item = (Element) items.item(i);
@@ -44,7 +57,6 @@ public class NoticiaService {
                 String descricao = item.getElementsByTagName("description").item(0).getTextContent();
                 descricao = descricao.replaceAll("<[^>]*>", ""); // Remove tags HTML
 
-                // Cria uma instância de Noticia e adiciona à lista
                 Noticia noticia = new Noticia(titulo, link, descricao, LocalDate.now());
                 noticias.add(noticia);
             }
@@ -54,17 +66,25 @@ public class NoticiaService {
         return noticias;
     }
 
-    // Método para buscar notícias por termo (filtragem em memória)
-    public List<Noticia> buscarNoticiasPorTermo(String termo) {
-        List<Noticia> noticias = obterNoticiasDoDia();
+    // Método para buscar e paginar notícias filtradas por termo
+    public List<Noticia> buscarNoticiasPorTermo(String termo, int page, int pageSize) {
+        List<Noticia> todasNoticias = obterNoticiasDoDia();
         List<Noticia> noticiasFiltradas = new ArrayList<>();
 
-        for (Noticia noticia : noticias) {
+        // Filtra as notícias pelo termo de busca
+        for (Noticia noticia : todasNoticias) {
             if (noticia.getTitulo().toLowerCase().contains(termo.toLowerCase()) ||
                     noticia.getDescricao().toLowerCase().contains(termo.toLowerCase())) {
                 noticiasFiltradas.add(noticia);
             }
         }
-        return noticiasFiltradas;
+
+        // Aplica a paginação
+        int fromIndex = page * pageSize;
+        int toIndex = Math.min(fromIndex + pageSize, noticiasFiltradas.size());
+        if (fromIndex > noticiasFiltradas.size()) {
+            return new ArrayList<>(); // Retorna lista vazia se a página está fora do intervalo
+        }
+        return noticiasFiltradas.subList(fromIndex, toIndex);
     }
 }
