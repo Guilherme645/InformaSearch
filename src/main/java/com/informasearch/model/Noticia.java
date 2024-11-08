@@ -17,9 +17,10 @@ public class Noticia {
     private LocalDate dataPublicacao;
     private String faviconUrl;
     private String sourceUrl;
+    private String categoria; // Novo campo categoria
 
     // Construtor que inclui o campo 'id'
-    public Noticia(String id, String titulo, String link, String descricao, LocalDate dataPublicacao, String faviconUrl, String sourceUrl) {
+    public Noticia(String id, String titulo, String link, String descricao, LocalDate dataPublicacao, String faviconUrl, String sourceUrl, String categoria) {
         this.id = id;
         this.titulo = titulo;
         this.link = link;
@@ -27,16 +28,18 @@ public class Noticia {
         this.dataPublicacao = dataPublicacao;
         this.faviconUrl = faviconUrl;
         this.sourceUrl = sourceUrl;
+        this.categoria = categoria; // Inicializa categoria
     }
 
-    // Construtor sem o campo 'id', caso 'id' seja gerado automaticamente
-    public Noticia(String titulo, String link, String descricao, LocalDate dataPublicacao, String faviconUrl, String sourceUrl) {
+    // Construtor sem o campo 'id'
+    public Noticia(String titulo, String link, String descricao, LocalDate dataPublicacao, String faviconUrl, String sourceUrl, String categoria) {
         this.titulo = titulo;
         this.link = link;
         this.descricao = descricao;
         this.dataPublicacao = dataPublicacao;
         this.faviconUrl = faviconUrl;
         this.sourceUrl = sourceUrl;
+        this.categoria = categoria; // Inicializa categoria
     }
 
     // Getters e setters
@@ -94,5 +97,13 @@ public class Noticia {
 
     public void setSourceUrl(String sourceUrl) {
         this.sourceUrl = sourceUrl;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 }

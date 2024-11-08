@@ -3,6 +3,7 @@ package com.informasearch.controller;
 import com.informasearch.model.Noticia;
 import com.informasearch.service.NoticiaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,12 +21,14 @@ public class NoticiaController {
         return noticiaService.obterNoticiasDoDia();
     }
 
-    // Endpoint para buscar notícias com termo e paginar os resultados
-    @GetMapping("/buscar")
-    public List<Noticia> buscarNoticiasPorTermo(
-            @RequestParam String termo,
+
+    @GetMapping("/noticiasC")
+    public ResponseEntity<List<Noticia>> buscarNoticias(
+            @RequestParam(required = false) String termo,
+            @RequestParam(required = false) String categoria,
             @RequestParam int page,
             @RequestParam int pageSize) {
-        return noticiaService.buscarNoticiasPorTermo(termo, page, pageSize);
+        List<Noticia> noticias = noticiaService.buscarNoticias(termo, categoria, page, pageSize);
+        return ResponseEntity.ok(noticias);
     }
 }
