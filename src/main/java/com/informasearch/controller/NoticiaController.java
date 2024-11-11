@@ -31,4 +31,17 @@ public class NoticiaController {
         List<Noticia> noticias = noticiaService.buscarNoticias(termo, categoria, page, pageSize);
         return ResponseEntity.ok(noticias);
     }
+
+    @PostMapping("/adicionar-feed")
+    public ResponseEntity<String> adicionarFeed(@RequestBody AdicionarFeedRequest request) {
+        try {
+            // Adiciona o feed usando o serviço
+            noticiaService.adicionarFeed(request.getUrl(), request.getCategorias());
+            return ResponseEntity.ok("Feed adicionado/atualizado com sucesso.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Erro ao adicionar o feed: " + e.getMessage());
+        }
+    }
 }

@@ -22,10 +22,39 @@ public class NoticiaService {
     // Lista de URLs de feeds RSS com categorias associadas
     private static final Map<String, String[]> RSS_FEEDS = new HashMap<>() {{
         put("https://portalnoticiasr7.webnode.page/rss/noticias.xml", new String[]{"geral"});
-        put("https://www.uol.com.br/rss.xml", new String[]{"geral", "esporte"});
-        put("https://g1.globo.com/rss/g1/", new String[]{"tecnologia", "politica"});
-        put("https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml", new String[]{"tecnologia"});
+        put(" https://g1.globo.com/dynamo/educacao/rss2.xml", new String[]{"educação"});
+        put("https://g1.globo.com/dynamo/tecnologia/rss2.xml", new String[]{"tecnologia"});
+        put(" https://g1.globo.com/dynamo/loterias/rss2.xml", new String[]{"loterias"});
+        put("  https://g1.globo.com/dynamo/concursos-e-emprego/rss2.xml", new String[]{"Concursos e Emprego"});
+        put("  https://g1.globo.com/dynamo/politica/mensalao/rss2.xml", new String[]{"politica"});
     }};
+
+    public void adicionarFeed(String url, String[] categorias) {
+        // Verifica se a URL ou categorias são inválidas
+        if (url == null || categorias == null || url.isEmpty() || categorias.length == 0) {
+            throw new IllegalArgumentException("URL ou categorias inválidas.");
+        }
+
+        // Sincronização para evitar problemas em ambientes multi-thread
+        synchronized (RSS_FEEDS) {
+            if (RSS_FEEDS.containsKey(url)) {
+                // Caso a URL já exista, mescla as categorias
+                String[] categoriasExistentes = RSS_FEEDS.get(url);
+                List<String> novaListaCategorias = new ArrayList<>(List.of(categoriasExistentes));
+                for (String categoria : categorias) {
+                    if (!novaListaCategorias.contains(categoria)) {
+                        novaListaCategorias.add(categoria);
+                    }
+                }
+                RSS_FEEDS.put(url, novaListaCategorias.toArray(new String[0]));
+                System.out.println("Feed atualizado: " + url + " com novas categorias.");
+            } else {
+                // Caso a URL não exista, adiciona o novo feed
+                RSS_FEEDS.put(url, categorias);
+                System.out.println("Novo feed adicionado: " + url);
+            }
+        }
+    }
 
     // Método para obter notícias do dia de todos os feeds RSS
     public List<Noticia> obterNoticiasDoDia() {
